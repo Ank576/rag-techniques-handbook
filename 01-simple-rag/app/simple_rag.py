@@ -7,11 +7,6 @@ st.write("Python version:", sys.version)
 spec = importlib.util.find_spec("fitz")
 st.write("Has fitz module:", spec is not None)
 
-
-st.write("Python:", sys.version)
-installed = {d.project_name.lower(): d.version for d in pkg_resources.working_set}
-st.write("Has PyMuPDF:", "pymupdf" in installed or "pymupdf" in installed or "pymupdf" in installed)
-
 import fitz # PyMuPDF
 import numpy as np
 from openai import OpenAI
