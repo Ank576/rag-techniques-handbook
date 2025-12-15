@@ -1,6 +1,6 @@
 PyMuPDF==1.24.12
-numpy
-openai
-streamlit
-python-dotenv
+numpy==2.3.5
+openai==1.57.0
+streamlit==1.52.1
+python-dotenv==1.0.1
 
