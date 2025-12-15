@@ -6,7 +6,28 @@ from typing import List
 import numpy as np
 import streamlit as st
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import OpenAI  # used for Perplexity-compatible client
+
+# ----- Environment & Perplexity client -----
+
+load_dotenv()
+
+PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY") or os.getenv("PPLX_API_KEY")
+
+if not PERPLEXITY_API_KEY:
+    st.error(
+        "Missing PERPLEXITY_API_KEY.\n\n"
+        "Set it in Streamlit secrets or a local .env file "
+        "before using the app."
+    )
+    st.stop()
+
+# Perplexity is OpenAI-compatible: just change base_url and use pplx key.
+# Example models: "llama-3.1-sonar-small-128k-online", "sonar-pro"
+client = OpenAI(
+    api_key=PERPLEXITY_API_KEY,
+    base_url="https://api.perplexity.ai",
+)
 
 # ----- Environment & dependency sanity checks -----
 
@@ -23,18 +44,6 @@ except ModuleNotFoundError:
     st.stop()
 
 # ----- Configuration -----
-
-load_dotenv()
-OPENAI_API_KEY = os.getenv("PERPLEXITY_API_KEY")
-
-if not OPENAI_API_KEY:
-    st.error(
-        "Missing OPENAI_API_KEY.\n\n"
-        "Set it in Streamlit secrets or a local .env file before using the app."
-    )
-    st.stop()
-
-client = OpenAI(api_key=OPENAI_API_KEY)
 
 st.set_page_config(
     page_title="Simple RAG – Financial Q&A",
