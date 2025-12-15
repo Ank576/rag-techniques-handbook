@@ -7,6 +7,10 @@ st.write("Python version:", sys.version)
 spec = importlib.util.find_spec("fitz")
 st.write("Has fitz module:", spec is not None)
 
+st.write("Python version:", sys.version)
+st.write("Has fitz module:", importlib.util.find_spec("fitz") is not None)
+
+
 import fitz # PyMuPDF
 import numpy as np
 from openai import OpenAI
