@@ -10,20 +10,6 @@ from openai import OpenAI
 
 # ----- Environment & dependency sanity checks -----
 
-st.write("Python version:", sys.version)
-st.write("Has fitz module:", importlib.util.find_spec("fitz") is not None)
-
-try:
-    import fitz  # PyMuPDF
-except ModuleNotFoundError:
-    st.error(
-        "PyMuPDF (fitz) is not installed in this environment.\n\n"
-        "Make sure `PyMuPDF` is present in `requirements.txt` for this app path."
-    )
-    st.stop()
-
-# ----- Configuration -----
-
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -36,6 +22,15 @@ if not OPENAI_API_KEY:
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
+try:
+    import fitz  # PyMuPDF
+except ModuleNotFoundError:
+    st.error(
+        "PyMuPDF (fitz) is not installed in this environment.\n\n"
+        "Make sure `PyMuPDF` is present in `requirements.txt` for this app path."
+    )
+    st.stop()
+
 st.set_page_config(
     page_title="Simple RAG – Financial Q&A",
     page_icon="📚",
@@ -45,7 +40,6 @@ st.title("📚 Simple RAG – Financial Document Q&A")
 st.markdown("Upload a PDF and ask questions about its content.")
 
 # ----- Helper functions -----
-
 
 def extract_text_from_pdf(pdf_file) -> str:
     """Extract text from an uploaded PDF file-like object."""
@@ -62,7 +56,6 @@ def extract_text_from_pdf(pdf_file) -> str:
         st.error(f"Failed to read PDF: {e}")
         return ""
 
-
 def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> List[str]:
     """Split text into overlapping chunks."""
     if not text:
@@ -73,7 +66,6 @@ def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> List[st
         chunks.append(text[i : i + chunk_size])
     return chunks
 
-
 def create_embeddings(inputs: List[str]):
     """Create embeddings using OpenAI for a list of strings."""
     if not inputs:
@@ -83,23 +75,16 @@ def create_embeddings(inputs: List[str]):
         input=inputs,
     )
 
-
 def cosine_similarity(vec1, vec2) -> float:
     """Calculate cosine similarity between two vectors."""
     v1 = np.array(vec1, dtype=float)
     v2 = np.array(vec2, dtype=float)
-    denom = (np.linalg.norm(v1) * np.linalg.norm(v2))
+    denom = np.linalg.norm(v1) * np.linalg.norm(v2)
     if denom == 0:
         return 0.0
     return float(np.dot(v1, v2) / denom)
 
-
-def semantic_search(
-    query: str,
-    text_chunks: List[str],
-    embeddings,
-    k: int = 3,
-) -> List[str]:
+def semantic_search(query: str, text_chunks: List[str], embeddings, k: int = 3) -> List[str]:
     """Find top-k most relevant chunks for a query."""
     if not text_chunks or embeddings is None:
         return []
@@ -115,7 +100,6 @@ def semantic_search(
     top_indices = [idx for idx, _ in similarity_scores[:k]]
     return [text_chunks[idx] for idx in top_indices]
 
-
 def generate_response(query: str, context_chunks: List[str]) -> str:
     """Generate an answer using GPT based strictly on provided context."""
     if not context_chunks:
@@ -129,7 +113,7 @@ def generate_response(query: str, context_chunks: List[str]) -> str:
         "You are a helpful financial assistant. "
         "Answer questions based strictly on the provided context. "
         "If the answer is not in the context, say "
-        "\"I don't have enough information to answer that.\""
+        "'I don't have enough information to answer that.'"
     )
 
     user_prompt = f"{context}\n\nQuestion: {query}"
@@ -144,7 +128,6 @@ def generate_response(query: str, context_chunks: List[str]) -> str:
     )
     return completion.choices[0].message.content.strip()
 
-
 # ----- Main UI -----
 
 uploaded_file = st.file_uploader("Upload a PDF document", type=["pdf"])
@@ -157,20 +140,14 @@ if uploaded_file:
         if not chunks:
             st.error("No text could be extracted from the PDF.")
         else:
-            # Create embeddings for all chunks once
             embeddings_response = create_embeddings(chunks)
-
-            # Store in session state
             st.session_state["chunks"] = chunks
             st.session_state["embeddings"] = embeddings_response.data
             st.session_state["text_length"] = len(text)
-
             st.success(
-                f"✅ Document processed! {len(chunks)} chunks created from "
-                f"{len(text)} characters."
+                f"✅ Document processed! {len(chunks)} chunks created from {len(text)} characters."
             )
 
-# Query interface
 if "chunks" in st.session_state and st.session_state["chunks"]:
     st.markdown("---")
     query = st.text_input("Ask a question about the document:")
@@ -178,10 +155,7 @@ if "chunks" in st.session_state and st.session_state["chunks"]:
     if query:
         with st.spinner("Searching and generating answer..."):
             relevant_chunks = semantic_search(
-                query,
-                st.session_state["chunks"],
-                st.session_state["embeddings"],
-                k=3,
+                query, st.session_state["chunks"], st.session_state["embeddings"], k=3
             )
             answer = generate_response(query, relevant_chunks)
 
@@ -191,15 +165,11 @@ if "chunks" in st.session_state and st.session_state["chunks"]:
         with st.expander("📄 View retrieved context"):
             for i, chunk in enumerate(relevant_chunks):
                 st.markdown(f"**Context {i+1}:**")
-                if len(chunk) > 500:
-                    st.text(chunk[:500] + "...")
-                else:
-                    st.text(chunk)
+                st.text(chunk[:500] + ("..." if len(chunk) > 500 else ""))
                 st.markdown("---")
 else:
     st.info("Upload a PDF to start asking questions about it.")
 
-# Sidebar info
 st.sidebar.markdown("## About Simple RAG")
 st.sidebar.markdown(
     """
