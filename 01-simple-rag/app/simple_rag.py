@@ -1,4 +1,12 @@
-import sys, pkg_resources, streamlit as st
+import sys
+import importlib
+import streamlit as st
+
+st.write("Python version:", sys.version)
+
+spec = importlib.util.find_spec("fitz")
+st.write("Has fitz module:", spec is not None)
+
 
 st.write("Python:", sys.version)
 installed = {d.project_name.lower(): d.version for d in pkg_resources.working_set}
