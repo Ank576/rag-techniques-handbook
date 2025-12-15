@@ -36,8 +36,8 @@ st.set_page_config(
     page_icon="📚",
 )
 
-st.title("📚 Simple RAG – Financial Document Q&A")
-st.markdown("Upload a PDF and ask questions about its content.")
+st.title("📚 Simple RAG – Fin-Doc Q&A")
+st.markdown("Upload a PDF and ask questions about its content.Created by Ankit for Education")
 
 # ----- Helper functions -----
 
