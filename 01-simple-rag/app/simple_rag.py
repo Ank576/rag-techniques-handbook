@@ -6,28 +6,7 @@ from typing import List
 import numpy as np
 import streamlit as st
 from dotenv import load_dotenv
-from openai import OpenAI  # used for Perplexity-compatible client
-
-# ----- Environment & Perplexity client -----
-
-load_dotenv()
-
-PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY") or os.getenv("PPLX_API_KEY")
-
-if not PERPLEXITY_API_KEY:
-    st.error(
-        "Missing PERPLEXITY_API_KEY.\n\n"
-        "Set it in Streamlit secrets or a local .env file "
-        "before using the app."
-    )
-    st.stop()
-
-# Perplexity is OpenAI-compatible: just change base_url and use pplx key.
-# Example models: "llama-3.1-sonar-small-128k-online", "sonar-pro"
-client = OpenAI(
-    api_key=PERPLEXITY_API_KEY,
-    base_url="https://api.perplexity.ai",
-)
+from openai import OpenAI
 
 # ----- Environment & dependency sanity checks -----
 
@@ -45,13 +24,25 @@ except ModuleNotFoundError:
 
 # ----- Configuration -----
 
+load_dotenv()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+if not OPENAI_API_KEY:
+    st.error(
+        "Missing OPENAI_API_KEY.\n\n"
+        "Set it in Streamlit secrets or a local .env file before using the app."
+    )
+    st.stop()
+
+client = OpenAI(api_key=OPENAI_API_KEY)
+
 st.set_page_config(
     page_title="Simple RAG – Financial Q&A",
     page_icon="📚",
 )
 
 st.title("📚 Simple RAG – Financial Document Q&A")
-st.markdown("Upload a PDF and ask questions about its content. Created by Ankit for educational purpose only")
+st.markdown("Upload a PDF and ask questions about its content.")
 
 # ----- Helper functions -----
 
@@ -84,17 +75,13 @@ def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> List[st
 
 
 def create_embeddings(inputs: List[str]):
+    """Create embeddings using OpenAI for a list of strings."""
     if not inputs:
         return None
-    try:
-        return client.embeddings.create(
-            model="text-embedding-3-small",
-            input=inputs,
-        )
-    except Exception as e:
-        import streamlit as st
-        st.error(f"Embedding error: {e}")
-        raise
+    return client.embeddings.create(
+        model="text-embedding-3-small",
+        input=inputs,
+    )
 
 
 def cosine_similarity(vec1, vec2) -> float:
