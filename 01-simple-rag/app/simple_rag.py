@@ -75,13 +75,13 @@ def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> List[st
 
 
 def create_embeddings(inputs: List[str]):
-    """Create embeddings using OpenAI for a list of strings."""
     if not inputs:
         return None
-    return client.embeddings.create(
-        model="text-embedding-3-small",
-        input=inputs,
-    )
+    try:
+        return client.embeddings.create(
+            model="text-embedding-3-small",
+            input=inputs,
+        )
     except Exception as e:
         import streamlit as st
         st.error(f"Embedding error: {e}")
