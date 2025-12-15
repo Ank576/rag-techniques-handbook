@@ -1,9 +1,15 @@
-import streamlit as st
 import pymupdf as fitz # PyMuPDF
 import numpy as np
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import pkg_resources
+import streamlit as st
+
+installed = {d.project_name: d.version for d in pkg_resources.working_set}
+st.write("Has PyMuPDF:", "PyMuPDF" in installed)
+st.write("Installed packages:", list(installed.keys())[:50])
+
 
 # Load environment variables
 load_dotenv()
