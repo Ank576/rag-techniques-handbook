@@ -82,6 +82,10 @@ def create_embeddings(inputs: List[str]):
         model="text-embedding-3-small",
         input=inputs,
     )
+    except Exception as e:
+        import streamlit as st
+        st.error(f"Embedding error: {e}")
+        raise
 
 
 def cosine_similarity(vec1, vec2) -> float:
