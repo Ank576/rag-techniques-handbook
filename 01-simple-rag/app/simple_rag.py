@@ -1,4 +1,10 @@
-import pymupdf as fitz # PyMuPDF
+import sys, pkg_resources, streamlit as st
+
+st.write("Python:", sys.version)
+installed = {d.project_name.lower(): d.version for d in pkg_resources.working_set}
+st.write("Has PyMuPDF:", "pymupdf" in installed or "pymupdf" in installed or "pymupdf" in installed)
+
+import fitz # PyMuPDF
 import numpy as np
 from openai import OpenAI
 import os
@@ -9,6 +15,8 @@ import streamlit as st
 installed = {d.project_name: d.version for d in pkg_resources.working_set}
 st.write("Has PyMuPDF:", "PyMuPDF" in installed)
 st.write("Installed packages:", list(installed.keys())[:50])
+
+
 
 
 # Load environment variables
