@@ -177,6 +177,9 @@ with tab1:
                         with st.expander(f"Chunk {i+1} ({len(chunk):,} chars)"):
                             st.write(chunk)
 
+        except Exception as e:
+            st.error(f"Error reading PDF: {e}")
+
 with tab2:
     if 'similarities' in st.session_state:
         fig = go.Figure()
