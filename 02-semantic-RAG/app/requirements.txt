@@ -1,6 +1,7 @@
-PyMuPDF
-numpy
-openai
 streamlit
-plotly
+openai
 python-dotenv
+numpy
+PyMuPDF
+plotly
+nltk
